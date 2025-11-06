@@ -93,6 +93,9 @@ typedef struct otPlatformConfig
                                                       ///< directly after initialization.
     CoprocessorType mCoprocessorType;                 ///< The co-processor type. This field is used to pass
                                                       ///< the type to the app layer.
+#if OPENTHREAD_POSIX_CONFIG_DAEMON_SOCKET_BASENAME_SET_API_ENABLE
+    const char               *mDaemonSocketBasename;  ///< The daemon / socket basename.
+#endif
 } otPlatformConfig;
 
 /**

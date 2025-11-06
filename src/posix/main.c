@@ -140,6 +140,9 @@ enum
 
     OT_POSIX_OPT_RADIO_VERSION,
     OT_POSIX_OPT_REAL_TIME_SIGNAL,
+#if OPENTHREAD_POSIX_CONFIG_DAEMON_SOCKET_BASENAME_SET_API_ENABLE
+    OT_POSIX_OPT_DAEMON_SOCKET_BASENAME,
+#endif
 };
 
 static const struct option kOptions[] = {
@@ -153,6 +156,9 @@ static const struct option kOptions[] = {
     {"real-time-signal", required_argument, NULL, OT_POSIX_OPT_REAL_TIME_SIGNAL},
     {"time-speed", required_argument, NULL, OT_POSIX_OPT_TIME_SPEED},
     {"verbose", no_argument, NULL, OT_POSIX_OPT_VERBOSE},
+#if OPENTHREAD_POSIX_CONFIG_DAEMON_SOCKET_BASENAME_SET_API_ENABLE
+    {"daemon-socket-basename", required_argument, NULL, OT_POSIX_OPT_DAEMON_SOCKET_BASENAME},
+#endif
     {0, 0, 0, 0}};
 
 static void PrintUsage(const char *aProgramName, FILE *aStream, int aExitCode)
@@ -177,6 +183,10 @@ static void PrintUsage(const char *aProgramName, FILE *aStream, int aExitCode)
             "                                  Use +N for relative value to SIGRTMIN, and use N for absolute value.\n");
 
 #endif
+#if OPENTHREAD_POSIX_CONFIG_DAEMON_SOCKET_BASENAME_SET_API_ENABLE
+    fprintf(aStream,
+            "        --daemon-socket-basename  (Linux only) The basename for daemon and socket.\n");
+#endif
     fprintf(aStream, "%s", otSysGetRadioUrlHelpString());
     exit(aExitCode);
 }
@@ -191,6 +201,10 @@ static void ParseArg(int aArgCount, char *aArgVector[], PosixConfig *aConfig)
     aConfig->mPlatformConfig.mInterfaceName       = OPENTHREAD_POSIX_CONFIG_THREAD_NETIF_DEFAULT_NAME;
 #ifdef SIGRTMIN
     aConfig->mPlatformConfig.mRealTimeSignal = SIGRTMIN;
+#endif
+
+#if OPENTHREAD_POSIX_CONFIG_DAEMON_SOCKET_BASENAME_SET_API_ENABLE
+    aConfig->mPlatformConfig.mDaemonSocketBasename = OPENTHREAD_POSIX_CONFIG_DAEMON_SOCKET_BASENAME;
 #endif
 
     optind = 1;
@@ -254,6 +268,11 @@ static void ParseArg(int aArgCount, char *aArgVector[], PosixConfig *aConfig)
             {
                 aConfig->mPlatformConfig.mRealTimeSignal = atoi(optarg);
             }
+            break;
+#endif
+#if OPENTHREAD_POSIX_CONFIG_DAEMON_SOCKET_BASENAME_SET_API_ENABLE
+        case OT_POSIX_OPT_DAEMON_SOCKET_BASENAME:
+            aConfig->mPlatformConfig.mDaemonSocketBasename = optarg;
             break;
 #endif
         case '?':

@@ -45,6 +45,13 @@ if(OT_DAEMON)
     set(OT_PLATFORM_DEFINES ${OT_PLATFORM_DEFINES} PARENT_SCOPE)
 endif()
 
+option(OT_DAEMON_SOCKET_BASENAME "Allow setting POSIX daemon / socket basename in runtime" OFF)
+if (OT_DAEMON_SOCKET_BASENAME)
+    target_compile_definitions(ot-posix-config
+        INTERFACE "OPENTHREAD_POSIX_CONFIG_DAEMON_SOCKET_BASENAME_SET_API_ENABLE=1"
+    )
+endif()
+
 if(OT_MULTIPAN_RCP)
     target_compile_definitions(ot-posix-config
         INTERFACE "OPENTHREAD_CONFIG_MULTIPAN_RCP_ENABLE=1"
