@@ -5490,21 +5490,37 @@ exit:
 template <> otError Interpreter::Process<Cmd("ping")>(Arg aArgs[]) { return mPing.Process(aArgs); }
 #endif // OPENTHREAD_CONFIG_PING_SENDER_ENABLE
 
-/**
- * @cli platform
- * @code
- * platform
- * NRF52840
- * Done
- * @endcode
- * @par
- * Print the current platform
- */
 template <> otError Interpreter::Process<Cmd("platform")>(Arg aArgs[])
 {
+    /**
+     * @cli platform
+     * @code
+     * platform
+     * NRF52840
+     * Done
+     * @endcode
+     * @par
+     * Print the current platform
+     */
+#if !OPENTHREAD_CONFIG_PLATFORM_INFO_SET_API_ENABLE
     OT_UNUSED_VARIABLE(aArgs);
     OutputLine("%s", OPENTHREAD_CONFIG_PLATFORM_INFO);
     return OT_ERROR_NONE;
+#else
+    /**
+     * @cli platform (set)
+     * @code
+     * platform NRF52840
+     * Done
+     * @endcode
+     * @par api_copy
+     * #otThreadSetPlatformInfo
+     * @cparam platform info @ca{name}
+     */
+    Error error = OT_ERROR_INVALID_ARGS;
+    error = ProcessGetSet(aArgs, otGetPlatformInfo, otSetPlatformInfo);
+    return error;
+#endif
 }
 
 /**
@@ -8594,7 +8610,10 @@ void Interpreter::SetCommandTimeout(uint32_t aTimeoutMilli)
 
 otError Interpreter::ProcessCommand(Arg aArgs[])
 {
-#define CmdEntry(aCommandString) {aCommandString, &Interpreter::Process<Cmd(aCommandString)>}
+#define CmdEntry(aCommandString)                                   \
+    {                                                              \
+        aCommandString, &Interpreter::Process<Cmd(aCommandString)> \
+    }
 
     static constexpr Command kCommands[] = {
 #if OPENTHREAD_FTD || OPENTHREAD_MTD

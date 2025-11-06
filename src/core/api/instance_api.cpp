@@ -137,6 +137,7 @@ otError otInstanceErasePersistentInfo(otInstance *aInstance) { return AsCoreType
 void otInstanceResetRadioStack(otInstance *aInstance) { AsCoreType(aInstance).ResetRadioStack(); }
 #endif
 
+// TODO: should we allow user to change version string on runtime?
 const char *otGetVersionString(void)
 {
     /**
@@ -201,5 +202,10 @@ const char *otGetRadioVersionString(otInstance *aInstance)
 const char *otGetPlatformInfo(otInstance *aInstance)
 {
     return AsCoreType(aInstance).GetPlatformInfo();
+}
+
+otError otSetPlatformInfo(otInstance *aInstance, const char *aPlatfromInfo)
+{
+    return AsCoreType(aInstance).SetPlatformInfo(aPlatfromInfo);
 }
 #endif
