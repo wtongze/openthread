@@ -199,4 +199,13 @@
  * @}
  */
 
+/**
+ * @def OPENTHREAD_CONFIG_PLATFORM_INFO_LENGTH
+ *
+ * Specifies the length of platform info field.
+ */
+#ifndef OPENTHREAD_CONFIG_PLATFORM_INFO_LENGTH
+#define OPENTHREAD_CONFIG_PLATFORM_INFO_LENGTH 32
+#endif
+
 #endif // CONFIG_PLATFORM_H_

@@ -160,7 +160,11 @@ template <> otError Joiner::Process<Cmd("start")>(Arg aArgs[])
                           aArgs[0].GetCString(),           // aPskd
                           aArgs[1].GetCString(),           // aProvisioningUrl (`nullptr` if aArgs[1] is empty)
                           PACKAGE_NAME,                    // aVendorName
+#if OPENTHREAD_CONFIG_PLATFORM_INFO_SET_API_ENABLE
+                          otGetPlatformInfo(GetInstancePtr()), // aVendorModel
+#else
                           OPENTHREAD_CONFIG_PLATFORM_INFO, // aVendorModel
+#endif
                           PACKAGE_VERSION,                 // aVendorSwVersion
                           nullptr,                         // aVendorData
                           &Joiner::HandleCallback, this);

@@ -271,6 +271,20 @@ public:
     void SetId(uint32_t aId) { mId = aId; }
 #endif
 
+#if OPENTHREAD_CONFIG_PLATFORM_INFO_SET_API_ENABLE
+    /**
+     * Get the platform info
+     */
+    const char *GetPlatformInfo(void) const { return mPlatformInfo; }
+
+    /**
+     * Set the platform info
+     * 
+     * @param[in] aPlatformInfo The plaform info to assign to the `Instance`
+     */
+    Error SetPlatformInfo(const char *aPlatformInfo);
+#endif
+
     /**
      * Indicates whether or not the instance is valid/initialized and not yet finalized.
      *
@@ -753,6 +767,10 @@ private:
 #endif
 #if OPENTHREAD_CONFIG_POWER_CALIBRATION_ENABLE && OPENTHREAD_CONFIG_PLATFORM_POWER_CALIBRATION_ENABLE
     Utils::PowerCalibration mPowerCalibration;
+#endif
+
+#if OPENTHREAD_CONFIG_PLATFORM_INFO_SET_API_ENABLE
+    char mPlatformInfo[OPENTHREAD_CONFIG_PLATFORM_INFO_LENGTH];
 #endif
 
     bool mIsInitialized;

@@ -300,6 +300,9 @@ Instance::Instance(void)
 #if OPENTHREAD_CONFIG_POWER_CALIBRATION_ENABLE && OPENTHREAD_CONFIG_PLATFORM_POWER_CALIBRATION_ENABLE
     , mPowerCalibration(*this)
 #endif
+#if OPENTHREAD_CONFIG_PLATFORM_INFO_SET_API_ENABLE
+    , mPlatformInfo(OPENTHREAD_CONFIG_PLATFORM_INFO)
+#endif
     , mIsInitialized(false)
     , mId(Random::NonCrypto::GetUint32())
 {
@@ -545,6 +548,13 @@ void Instance::SetLogLevel(LogLevel aLogLevel)
 
 extern "C" OT_TOOL_WEAK void otPlatLogHandleLevelChanged(otLogLevel aLogLevel) { OT_UNUSED_VARIABLE(aLogLevel); }
 
+#endif
+
+#if OPENTHREAD_CONFIG_PLATFORM_INFO_SET_API_ENABLE
+Error Instance::SetPlatformInfo(const char *aPlatformInfo)
+{
+    return StringCopy(mPlatformInfo, aPlatformInfo, kStringCheckUtf8Encoding);
+}
 #endif
 
 } // namespace ot

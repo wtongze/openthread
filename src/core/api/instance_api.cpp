@@ -196,3 +196,10 @@ const char *otGetRadioVersionString(otInstance *aInstance)
 {
     return AsCoreType(aInstance).Get<Radio>().GetVersionString();
 }
+
+#if OPENTHREAD_CONFIG_PLATFORM_INFO_SET_API_ENABLE
+const char *otGetPlatformInfo(otInstance *aInstance)
+{
+    return AsCoreType(aInstance).GetPlatformInfo();
+}
+#endif

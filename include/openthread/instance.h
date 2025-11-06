@@ -348,6 +348,17 @@ const char *otGetVersionString(void);
  */
 const char *otGetRadioVersionString(otInstance *aInstance);
 
+#if OPENTHREAD_CONFIG_PLATFORM_INFO_SET_API_ENABLE
+/**
+ * Gets the OpenThread platform info string.
+ * 
+ * @param[in]  aInstance A pointer to an OpenThread instance.
+ *
+ * @returns A pointer to the OpenThread platform info.
+ */
+const char *otGetPlatformInfo(otInstance *aInstance);
+#endif
+
 /**
  * @}
  */
