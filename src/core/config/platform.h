@@ -200,6 +200,16 @@
  */
 
 /**
+ * @def OPENTHREAD_CONFIG_PLATFORM_INFO_SET_API_ENABLE
+ *
+ * Specifies the default behavior for allowing user to change platform info at runtime.
+ * Setting 0 to disable this by default.
+ */
+#ifndef OPENTHREAD_CONFIG_PLATFORM_INFO_SET_API_ENABLE
+#define OPENTHREAD_CONFIG_PLATFORM_INFO_SET_API_ENABLE 0
+#endif
+
+/**
  * @def OPENTHREAD_CONFIG_PLATFORM_INFO_LENGTH
  *
  * Specifies the length of platform info field.

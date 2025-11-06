@@ -348,9 +348,10 @@ const char *otGetVersionString(void);
  */
 const char *otGetRadioVersionString(otInstance *aInstance);
 
-#if OPENTHREAD_CONFIG_PLATFORM_INFO_SET_API_ENABLE
 /**
  * Gets the OpenThread platform info string.
+ * 
+ * Requires `OPENTHREAD_CONFIG_PLATFORM_INFO_SET_API_ENABLE`.
  * 
  * @param[in]  aInstance A pointer to an OpenThread instance.
  *
@@ -373,7 +374,6 @@ const char *otGetPlatformInfo(otInstance *aInstance);
  * @retval OT_ERROR_INVALID_ARGS  @p aPlatfromInfo is not valid (too long or not UTF8).
  */
 otError otSetPlatformInfo(otInstance *aInstance, const char *aPlatfromInfo);
-#endif
 
 /**
  * @}
