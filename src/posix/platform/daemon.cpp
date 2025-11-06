@@ -194,7 +194,11 @@ void Daemon::createListenSocketOrDie(void)
     }
 }
 #else
+#if !OPENTHREAD_POSIX_CONFIG_DAEMON_SOCKET_BASENAME_SET_API_ENABLE
 void Daemon::createListenSocketOrDie(void)
+#else
+void Daemon::createListenSocketOrDie(const char *aDaemonSocketBasename)
+#endif
 {
     struct sockaddr_un sockname;
     int                ret;
@@ -235,9 +239,15 @@ void Daemon::createListenSocketOrDie(void)
     {
         static_assert(sizeof(OPENTHREAD_POSIX_DAEMON_SOCKET_LOCK) == sizeof(OPENTHREAD_POSIX_DAEMON_SOCKET_NAME),
                       "sock and lock file name pattern should have the same length!");
+
         Filename lockfile;
 
+#if !OPENTHREAD_POSIX_CONFIG_DAEMON_SOCKET_BASENAME_SET_API_ENABLE
         GetFilename(lockfile, OPENTHREAD_POSIX_DAEMON_SOCKET_LOCK);
+#else
+        // TODO: append ".lock" suffix
+        GetFilename(lockfile, aDaemonSocketBasename);
+#endif
 
         mDaemonLock = open(lockfile, O_CREAT | O_RDONLY | O_CLOEXEC, 0600);
     }
@@ -271,13 +281,21 @@ void Daemon::createListenSocketOrDie(void)
 }
 #endif // OPENTHREAD_POSIX_CONFIG_ANDROID_ENABLE
 
+#if !OPENTHREAD_POSIX_CONFIG_DAEMON_SOCKET_BASENAME_SET_API_ENABLE
 void Daemon::SetUp(void)
+#else
+void Daemon::SetUp(const char *aDaemonSocketBasename)
+#endif
 {
     int ret;
 
     // This allows implementing pseudo reset.
     VerifyOrExit(mListenSocket == -1);
+#if !OPENTHREAD_POSIX_CONFIG_DAEMON_SOCKET_BASENAME_SET_API_ENABLE
     createListenSocketOrDie();
+#else
+    createListenSocketOrDie(aDaemonSocketBasename);
+#endif
 
     //
     // only accept 1 connection.

@@ -212,7 +212,9 @@ void platformInit(otPlatformConfig *aPlatformConfig)
 
 void platformSetUp(otPlatformConfig *aPlatformConfig)
 {
+#if !OPENTHREAD_POSIX_CONFIG_DAEMON_SOCKET_BASENAME_SET_API_ENABLE
     OT_UNUSED_VARIABLE(aPlatformConfig);
+#endif
 
     VerifyOrExit(!gDryRun);
 
@@ -250,7 +252,11 @@ void platformSetUp(otPlatformConfig *aPlatformConfig)
 #endif
 
 #if OPENTHREAD_POSIX_CONFIG_DAEMON_ENABLE
+#if OPENTHREAD_POSIX_CONFIG_DAEMON_SOCKET_BASENAME_SET_API_ENABLE
+    ot::Posix::Daemon::Get().SetUp(aPlatformConfig->mDaemonSocketBasename);
+#else
     ot::Posix::Daemon::Get().SetUp();
+#endif
 #endif
 
     SuccessOrDie(otSetStateChangedCallback(gInstance, processStateChange, gInstance));

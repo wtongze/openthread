@@ -45,7 +45,11 @@ public:
 
     static Daemon &Get(void);
 
+#if !OPENTHREAD_POSIX_CONFIG_DAEMON_SOCKET_BASENAME_SET_API_ENABLE
     void SetUp(void);
+#else
+    void SetUp(const char *aDaemonSocketBasename);
+#endif
     void TearDown(void);
     void Update(Mainloop::Context &aContext) override;
     void Process(const Mainloop::Context &aContext) override;
@@ -53,7 +57,11 @@ public:
 
 private:
     int  OutputFormat(const char *aFormat, ...);
+#if !OPENTHREAD_POSIX_CONFIG_DAEMON_SOCKET_BASENAME_SET_API_ENABLE
     void createListenSocketOrDie(void);
+#else
+    void createListenSocketOrDie(const char *aDaemonSocketBasename);
+#endif
     void InitializeSessionSocket(void);
 
     int mListenSocket  = -1;
