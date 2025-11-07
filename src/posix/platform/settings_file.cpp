@@ -57,7 +57,7 @@ otError SettingsFile::Init(const char *aSettingsFileBaseName)
 otError SettingsFile::Init(const char *aSettingsFileBaseName, const char *aSettingsPath)
 {
     otError     error     = OT_ERROR_NONE;
-    strncpy(mSettingPath, aSettingsPath, sizeof(mSettingPath) - 1);
+    strncpy(mSettingsPath, aSettingsPath, sizeof(mSettingsPath) - 1);
 
     OT_ASSERT((aSettingsFileBaseName != nullptr) && (strlen(aSettingsFileBaseName) < kMaxFileBaseNameSize));
     strncpy(mSettingFileBaseName, aSettingsFileBaseName, sizeof(mSettingFileBaseName) - 1);
@@ -65,9 +65,9 @@ otError SettingsFile::Init(const char *aSettingsFileBaseName, const char *aSetti
     {
         struct stat st;
 
-        if (stat(mSettingPath, &st) == -1)
+        if (stat(mSettingsPath, &st) == -1)
         {
-            VerifyOrDie(mkdir(mSettingPath, 0755) == 0, OT_EXIT_ERROR_ERRNO);
+            VerifyOrDie(mkdir(mSettingsPath, 0755) == 0, OT_EXIT_ERROR_ERRNO);
         }
     }
 
@@ -311,7 +311,7 @@ void SettingsFile::Wipe(void) { VerifyOrDie(0 == ftruncate(mSettingsFd, 0), OT_E
 
 void SettingsFile::GetSettingsFilePath(char aFileName[kMaxFilePathSize], bool aSwap)
 {
-    snprintf(aFileName, kMaxFilePathSize, "%s/%s.%s", mSettingPath, mSettingFileBaseName,
+    snprintf(aFileName, kMaxFilePathSize, "%s/%s.%s", mSettingsPath, mSettingFileBaseName,
              (aSwap ? "Swap" : "data"));
 }
 

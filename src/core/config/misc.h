@@ -385,6 +385,15 @@
 #endif
 
 /**
+ * @def OPENTHREAD_CONFIG_POSIX_SETTINGS_PATH_MAX_SIZE
+ *
+ * The max size of settings storage path on posix platform.
+ */
+#ifndef OPENTHREAD_CONFIG_POSIX_SETTINGS_PATH_MAX_SIZE
+#define OPENTHREAD_CONFIG_POSIX_SETTINGS_PATH_MAX_SIZE 32
+#endif
+
+/**
  * @def OPENTHREAD_CONFIG_PLATFORM_BOOTLOADER_MODE_ENABLE
  *
  * Define to 1 to enable support reset to bootloader mode.

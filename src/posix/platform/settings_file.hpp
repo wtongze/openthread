@@ -109,7 +109,7 @@ public:
     void Wipe(void);
 
 private:
-    static const size_t kMaxFileDirectorySize   = sizeof(OPENTHREAD_CONFIG_POSIX_SETTINGS_PATH);
+    static const size_t kMaxFileDirectorySize   = OPENTHREAD_CONFIG_POSIX_SETTINGS_PATH_MAX_SIZE;
     static const size_t kSlashLength            = 1;
     static const size_t kMaxFileBaseNameSize    = 64;
     static const size_t kMaxFileExtensionLength = 5; ///< The length of `.Swap` or `.data`.
@@ -123,7 +123,7 @@ private:
     void    SwapPersist(int aFd);
     void    SwapDiscard(int aFd);
 
-    char mSettingPath[kMaxFileDirectorySize];
+    char mSettingsPath[kMaxFileDirectorySize];
     char mSettingFileBaseName[kMaxFileBaseNameSize];
     int  mSettingsFd;
 };
