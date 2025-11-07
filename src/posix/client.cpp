@@ -175,14 +175,20 @@ int ConnectSession(const Config &aConfig)
                        aConfig.mNetifName);
 #else
         char daemonSocketName[sizeof(sockname.sun_path)];
-        ret = snprintf(daemonSocketName, sizeof(sockname.sun_path), "%s-%%s.sock", aConfig.mDaemonSocketBasename);
+
+        if (strcmp(aConfig.mDaemonSocketBasename, OPENTHREAD_POSIX_CONFIG_DAEMON_SOCKET_BASENAME) != 0)
+        {
+            ret = snprintf(daemonSocketName, sizeof(sockname.sun_path), "%s-%%s.sock", aConfig.mDaemonSocketBasename);
+        }
+        else
+        {
+            ret = snprintf(daemonSocketName, sizeof(sockname.sun_path), "%s.sock", aConfig.mDaemonSocketBasename);
+        }
+
         VerifyOrExit(ret >= 0 && static_cast<size_t>(ret) < sizeof(sockname.sun_path), {
             errno = EINVAL;
             ret   = -1;
         });
-
-        // TODO: debug
-        printf("arg: %s", daemonSocketName);
 
         ret = snprintf(sockname.sun_path, sizeof(sockname.sun_path), daemonSocketName, aConfig.mNetifName);
 #endif
@@ -263,12 +269,12 @@ Config ParseArg(int &aArgCount, char **&aArgVector)
 #if !OPENTHREAD_POSIX_CONFIG_DAEMON_SOCKET_BASENAME_SET_API_ENABLE
     Config config = {OPENTHREAD_POSIX_CONFIG_THREAD_NETIF_DEFAULT_NAME};
 #else
-    Config config = {OPENTHREAD_POSIX_CONFIG_THREAD_NETIF_DEFAULT_NAME, OPENTHREAD_POSIX_DAEMON_SOCKET_NAME};
+    Config config = {OPENTHREAD_POSIX_CONFIG_THREAD_NETIF_DEFAULT_NAME, OPENTHREAD_POSIX_CONFIG_DAEMON_SOCKET_BASENAME};
 #endif
 
     optind = 1;
 
-    for (int index, option; (option = getopt_long(aArgCount, aArgVector, "+I:h", kOptions, &index)) != -1;)
+    for (int index, option; (option = getopt_long(aArgCount, aArgVector, "+D:I:h", kOptions, &index)) != -1;)
     {
         switch (option)
         {

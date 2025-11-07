@@ -294,13 +294,29 @@ void Daemon::createListenSocketOrDie(void)
 void Daemon::SetDaemonSocketBasename(const char *aDaemonSocketBasename)
 {
     int rval;
-    rval = snprintf(mDaemonSocketLock, sizeof(Filename), "%s-%%s.lock", aDaemonSocketBasename);
+    if (strcmp(aDaemonSocketBasename, OPENTHREAD_POSIX_CONFIG_DAEMON_SOCKET_BASENAME) != 0)
+    {
+        rval = snprintf(mDaemonSocketLock, sizeof(Filename), "%s-%%s.lock", aDaemonSocketBasename);
+    }
+    else
+    {
+        rval = snprintf(mDaemonSocketLock, sizeof(Filename), "%s.lock", aDaemonSocketBasename);
+    }
+    
     if (rval < 0 && static_cast<size_t>(rval) >= sizeof(Filename))
     {
         DieNow(OT_EXIT_INVALID_ARGUMENTS);
     }
 
-    rval = snprintf(mDaemonSocketName, sizeof(Filename), "%s-%%s.sock", aDaemonSocketBasename);
+    if (strcmp(aDaemonSocketBasename, OPENTHREAD_POSIX_CONFIG_DAEMON_SOCKET_BASENAME) != 0)
+    {
+        rval = snprintf(mDaemonSocketName, sizeof(Filename), "%s-%%s.sock", aDaemonSocketBasename);
+    }
+    else
+    {
+        rval = snprintf(mDaemonSocketName, sizeof(Filename), "%s.sock", aDaemonSocketBasename);
+    }
+    
     if (rval < 0 && static_cast<size_t>(rval) >= sizeof(Filename))
     {
         DieNow(OT_EXIT_INVALID_ARGUMENTS);
@@ -310,9 +326,6 @@ void Daemon::SetDaemonSocketBasename(const char *aDaemonSocketBasename)
     {
         DieNow(OT_EXIT_INVALID_ARGUMENTS);
     }
-
-    // TODO: Debug
-    printf(">>> %s %s\n", mDaemonSocketLock, mDaemonSocketName);
 }
 #endif
 

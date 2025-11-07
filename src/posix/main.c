@@ -128,6 +128,9 @@ typedef struct PosixConfig
 enum
 {
     OT_POSIX_OPT_BACKBONE_INTERFACE_NAME = 'B',
+#if OPENTHREAD_POSIX_CONFIG_DAEMON_SOCKET_BASENAME_SET_API_ENABLE
+    OT_POSIX_OPT_DAEMON_SOCKET_BASENAME  = 'D',
+#endif
     OT_POSIX_OPT_DEBUG_LEVEL             = 'd',
     OT_POSIX_OPT_DRY_RUN                 = 'n',
     OT_POSIX_OPT_HELP                    = 'h',
@@ -140,9 +143,6 @@ enum
 
     OT_POSIX_OPT_RADIO_VERSION,
     OT_POSIX_OPT_REAL_TIME_SIGNAL,
-#if OPENTHREAD_POSIX_CONFIG_DAEMON_SOCKET_BASENAME_SET_API_ENABLE
-    OT_POSIX_OPT_DAEMON_SOCKET_BASENAME,
-#endif
 };
 
 static const struct option kOptions[] = {
@@ -168,6 +168,9 @@ static void PrintUsage(const char *aProgramName, FILE *aStream, int aExitCode)
             "    %s [Options] RadioURL [RadioURL]\n"
             "Options:\n"
             "    -B  --backbone-interface-name Backbone network interface name.\n"
+#if OPENTHREAD_POSIX_CONFIG_DAEMON_SOCKET_BASENAME_SET_API_ENABLE
+            "    -D  --daemon-socket-basename  (Linux only) The basename for daemon socket.\n"
+#endif
             "    -d  --debug-level             Debug level of logging.\n"
             "    -h  --help                    Display this usage information.\n"
             "    -I  --interface-name name     Thread network interface name.\n"
@@ -182,10 +185,6 @@ static void PrintUsage(const char *aProgramName, FILE *aStream, int aExitCode)
             "        --real-time-signal        (Linux only) The real-time signal number for microsecond timer.\n"
             "                                  Use +N for relative value to SIGRTMIN, and use N for absolute value.\n");
 
-#endif
-#if OPENTHREAD_POSIX_CONFIG_DAEMON_SOCKET_BASENAME_SET_API_ENABLE
-    fprintf(aStream,
-            "        --daemon-socket-basename  (Linux only) The basename for daemon and socket.\n");
 #endif
     fprintf(aStream, "%s", otSysGetRadioUrlHelpString());
     exit(aExitCode);
@@ -212,7 +211,7 @@ static void ParseArg(int aArgCount, char *aArgVector[], PosixConfig *aConfig)
     while (true)
     {
         int index  = 0;
-        int option = getopt_long(aArgCount, aArgVector, "B:d:hI:nps:v", kOptions, &index);
+        int option = getopt_long(aArgCount, aArgVector, "B:D:d:hI:nps:v", kOptions, &index);
 
         if (option == -1)
         {
