@@ -68,6 +68,9 @@ namespace {
 struct Config
 {
     const char *mNetifName;
+#if OPENTHREAD_POSIX_CONFIG_DAEMON_SOCKET_BASENAME_SET_API_ENABLE
+    const char *mDaemonSocketBasename;
+#endif
 };
 
 static constexpr uint16_t kLineBufferSize = OPENTHREAD_CONFIG_CLI_MAX_LINE_LENGTH;
@@ -167,8 +170,22 @@ int ConnectSession(const Config &aConfig)
 
         memset(&sockname, 0, sizeof(struct sockaddr_un));
         sockname.sun_family = AF_UNIX;
+#if !OPENTHREAD_POSIX_CONFIG_DAEMON_SOCKET_BASENAME_SET_API_ENABLE
         ret = snprintf(sockname.sun_path, sizeof(sockname.sun_path), OPENTHREAD_POSIX_DAEMON_SOCKET_NAME,
                        aConfig.mNetifName);
+#else
+        char daemonSocketName[sizeof(sockname.sun_path)];
+        ret = snprintf(daemonSocketName, sizeof(sockname.sun_path), "%s-%%s.sock", aConfig.mDaemonSocketBasename);
+        VerifyOrExit(ret >= 0 && static_cast<size_t>(ret) < sizeof(sockname.sun_path), {
+            errno = EINVAL;
+            ret   = -1;
+        });
+
+        // TODO: debug
+        printf("arg: %s", daemonSocketName);
+
+        ret = snprintf(sockname.sun_path, sizeof(sockname.sun_path), daemonSocketName, aConfig.mNetifName);
+#endif
         VerifyOrExit(ret >= 0 && static_cast<size_t>(ret) < sizeof(sockname.sun_path), {
             errno = EINVAL;
             ret   = -1;
@@ -205,10 +222,16 @@ exit:
     return ok;
 }
 
+#if OPENTHREAD_POSIX_CONFIG_DAEMON_SOCKET_BASENAME_SET_API_ENABLE
+constexpr char kOptDaemonSocketBasename = 'D';
+#endif
 constexpr char kOptInterfaceName = 'I';
 constexpr char kOptHelp          = 'h';
 
 const struct option kOptions[] = {
+#if OPENTHREAD_POSIX_CONFIG_DAEMON_SOCKET_BASENAME_SET_API_ENABLE
+    {"daemon-socket-basename", required_argument, NULL, kOptDaemonSocketBasename},
+#endif
     {"interface-name", required_argument, NULL, kOptInterfaceName},
     {"help", required_argument, NULL, kOptHelp},
 };
@@ -219,8 +242,13 @@ void PrintUsage(const char *aProgramName, FILE *aStream, int aExitCode)
             "Syntax:\n"
             "    %s [Options] [--] ...\n"
             "Options:\n"
-            "    -h  --help                    Display this usage information.\n"
-            "    -I  --interface-name name     Thread network interface name.\n",
+            "    -h  --help                         Display this usage information.\n"
+#if !OPENTHREAD_POSIX_CONFIG_DAEMON_SOCKET_BASENAME_SET_API_ENABLE
+            "    -I  --interface-name name          Thread network interface name.\n",
+#else
+            "    -I  --interface-name name          Thread network interface name.\n"
+            "    -D  --daemon-socket-basename name  Basename for daemon socket.\n",
+#endif
             aProgramName);
     exit(aExitCode);
 }
@@ -232,7 +260,11 @@ static bool ShouldEscape(char aChar)
 
 Config ParseArg(int &aArgCount, char **&aArgVector)
 {
+#if !OPENTHREAD_POSIX_CONFIG_DAEMON_SOCKET_BASENAME_SET_API_ENABLE
     Config config = {OPENTHREAD_POSIX_CONFIG_THREAD_NETIF_DEFAULT_NAME};
+#else
+    Config config = {OPENTHREAD_POSIX_CONFIG_THREAD_NETIF_DEFAULT_NAME, OPENTHREAD_POSIX_DAEMON_SOCKET_NAME};
+#endif
 
     optind = 1;
 
@@ -240,6 +272,11 @@ Config ParseArg(int &aArgCount, char **&aArgVector)
     {
         switch (option)
         {
+#if OPENTHREAD_POSIX_CONFIG_DAEMON_SOCKET_BASENAME_SET_API_ENABLE
+        case kOptDaemonSocketBasename:
+            config.mDaemonSocketBasename = optarg;
+            break;
+#endif
         case kOptInterfaceName:
             config.mNetifName = optarg;
             break;
