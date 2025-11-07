@@ -51,8 +51,13 @@ namespace Posix {
 
 otError SettingsFile::Init(const char *aSettingsFileBaseName)
 {
+    Init(aSettingsFileBaseName, OPENTHREAD_CONFIG_POSIX_SETTINGS_PATH);
+}
+
+otError SettingsFile::Init(const char *aSettingsFileBaseName, const char *aSettingsPath)
+{
     otError     error     = OT_ERROR_NONE;
-    const char *directory = OPENTHREAD_CONFIG_POSIX_SETTINGS_PATH;
+    strncpy(mSettingPath, aSettingsPath, sizeof(mSettingPath) - 1);
 
     OT_ASSERT((aSettingsFileBaseName != nullptr) && (strlen(aSettingsFileBaseName) < kMaxFileBaseNameSize));
     strncpy(mSettingFileBaseName, aSettingsFileBaseName, sizeof(mSettingFileBaseName) - 1);
@@ -60,9 +65,9 @@ otError SettingsFile::Init(const char *aSettingsFileBaseName)
     {
         struct stat st;
 
-        if (stat(directory, &st) == -1)
+        if (stat(mSettingPath, &st) == -1)
         {
-            VerifyOrDie(mkdir(directory, 0755) == 0, OT_EXIT_ERROR_ERRNO);
+            VerifyOrDie(mkdir(mSettingPath, 0755) == 0, OT_EXIT_ERROR_ERRNO);
         }
     }
 
@@ -306,7 +311,7 @@ void SettingsFile::Wipe(void) { VerifyOrDie(0 == ftruncate(mSettingsFd, 0), OT_E
 
 void SettingsFile::GetSettingsFilePath(char aFileName[kMaxFilePathSize], bool aSwap)
 {
-    snprintf(aFileName, kMaxFilePathSize, OPENTHREAD_CONFIG_POSIX_SETTINGS_PATH "/%s.%s", mSettingFileBaseName,
+    snprintf(aFileName, kMaxFilePathSize, "%s/%s.%s", mSettingPath, mSettingFileBaseName,
              (aSwap ? "Swap" : "data"));
 }
 

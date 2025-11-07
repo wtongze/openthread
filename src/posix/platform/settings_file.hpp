@@ -53,6 +53,8 @@ public:
      */
     otError Init(const char *aSettingsFileBaseName);
 
+    otError Init(const char *aSettingsFileBaseName, const char *aSettingsPath);
+
     /**
      * Performs the de-initialization for the settings file.
      */
@@ -121,6 +123,7 @@ private:
     void    SwapPersist(int aFd);
     void    SwapDiscard(int aFd);
 
+    char mSettingPath[kMaxFileDirectorySize];
     char mSettingFileBaseName[kMaxFileBaseNameSize];
     int  mSettingsFd;
 };
