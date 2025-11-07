@@ -51,9 +51,11 @@
 
 #if OPENTHREAD_POSIX_CONFIG_DAEMON_ENABLE
 
+#if !OPENTHREAD_POSIX_CONFIG_DAEMON_SOCKET_BASENAME_SET_API_ENABLE
 #define OPENTHREAD_POSIX_DAEMON_SOCKET_LOCK OPENTHREAD_POSIX_CONFIG_DAEMON_SOCKET_BASENAME ".lock"
 static_assert(sizeof(OPENTHREAD_POSIX_DAEMON_SOCKET_NAME) < sizeof(sockaddr_un::sun_path),
               "OpenThread daemon socket name too long!");
+#endif
 
 namespace ot {
 namespace Posix {
@@ -194,11 +196,7 @@ void Daemon::createListenSocketOrDie(void)
     }
 }
 #else
-#if !OPENTHREAD_POSIX_CONFIG_DAEMON_SOCKET_BASENAME_SET_API_ENABLE
 void Daemon::createListenSocketOrDie(void)
-#else
-void Daemon::createListenSocketOrDie(const char *aDaemonSocketBasename)
-#endif
 {
     struct sockaddr_un sockname;
     int                ret;
@@ -237,16 +235,16 @@ void Daemon::createListenSocketOrDie(const char *aDaemonSocketBasename)
     }
 
     {
+#if !OPENTHREAD_POSIX_CONFIG_DAEMON_SOCKET_BASENAME_SET_API_ENABLE
         static_assert(sizeof(OPENTHREAD_POSIX_DAEMON_SOCKET_LOCK) == sizeof(OPENTHREAD_POSIX_DAEMON_SOCKET_NAME),
                       "sock and lock file name pattern should have the same length!");
-
+#endif
         Filename lockfile;
 
 #if !OPENTHREAD_POSIX_CONFIG_DAEMON_SOCKET_BASENAME_SET_API_ENABLE
         GetFilename(lockfile, OPENTHREAD_POSIX_DAEMON_SOCKET_LOCK);
 #else
-        // TODO: append ".lock" suffix
-        GetFilename(lockfile, aDaemonSocketBasename);
+        GetFilename(lockfile, mDaemonSocketLock);
 #endif
 
         mDaemonLock = open(lockfile, O_CREAT | O_RDONLY | O_CLOEXEC, 0600);
@@ -265,7 +263,13 @@ void Daemon::createListenSocketOrDie(const char *aDaemonSocketBasename)
     memset(&sockname, 0, sizeof(struct sockaddr_un));
 
     sockname.sun_family = AF_UNIX;
+
+#if !OPENTHREAD_POSIX_CONFIG_DAEMON_SOCKET_BASENAME_SET_API_ENABLE
     GetFilename(sockname.sun_path, OPENTHREAD_POSIX_DAEMON_SOCKET_NAME);
+#else
+    GetFilename(sockname.sun_path, mDaemonSocketName);
+#endif
+
     (void)unlink(sockname.sun_path);
 
     {
@@ -281,21 +285,40 @@ void Daemon::createListenSocketOrDie(const char *aDaemonSocketBasename)
 }
 #endif // OPENTHREAD_POSIX_CONFIG_ANDROID_ENABLE
 
-#if !OPENTHREAD_POSIX_CONFIG_DAEMON_SOCKET_BASENAME_SET_API_ENABLE
-void Daemon::SetUp(void)
-#else
-void Daemon::SetUp(const char *aDaemonSocketBasename)
+#if OPENTHREAD_POSIX_CONFIG_DAEMON_SOCKET_BASENAME_SET_API_ENABLE
+void Daemon::SetDaemonSocketBasename(const char *aDaemonSocketBasename)
+{
+    int rval;
+    rval = snprintf(mDaemonSocketLock, sizeof(Filename), "%s-%%s.lock", aDaemonSocketBasename);
+    if (rval < 0 && static_cast<size_t>(rval) >= sizeof(Filename))
+    {
+        DieNow(OT_EXIT_INVALID_ARGUMENTS);
+    }
+
+    rval = snprintf(mDaemonSocketName, sizeof(Filename), "%s-%%s.sock", aDaemonSocketBasename);
+    if (rval < 0 && static_cast<size_t>(rval) >= sizeof(Filename))
+    {
+        DieNow(OT_EXIT_INVALID_ARGUMENTS);
+    }
+
+    if (strnlen(mDaemonSocketLock, OPENTHREAD_POSIX_CONFIG_DAEMON_SOCKET_BASENAME_SIZE) != 
+        strnlen(mDaemonSocketName, OPENTHREAD_POSIX_CONFIG_DAEMON_SOCKET_BASENAME_SIZE))
+    {
+        DieNow(OT_EXIT_INVALID_ARGUMENTS);
+    }
+
+    // TODO: Debug
+    printf(">>> %s %s\n", mDaemonSocketLock, mDaemonSocketName);
+}
 #endif
+
+void Daemon::SetUp(void)
 {
     int ret;
 
     // This allows implementing pseudo reset.
     VerifyOrExit(mListenSocket == -1);
-#if !OPENTHREAD_POSIX_CONFIG_DAEMON_SOCKET_BASENAME_SET_API_ENABLE
     createListenSocketOrDie();
-#else
-    createListenSocketOrDie(aDaemonSocketBasename);
-#endif
 
     //
     // only accept 1 connection.
@@ -337,8 +360,11 @@ void Daemon::TearDown(void)
     if (gPlatResetReason != OT_PLAT_RESET_REASON_SOFTWARE)
     {
         Filename sockfile;
-
+#if !OPENTHREAD_POSIX_CONFIG_DAEMON_SOCKET_BASENAME_SET_API_ENABLE
         GetFilename(sockfile, OPENTHREAD_POSIX_DAEMON_SOCKET_NAME);
+#else
+        GetFilename(sockfile, mDaemonSocketName);
+#endif
         LogDebg("Removing daemon socket: %s", sockfile);
         (void)unlink(sockfile);
     }
