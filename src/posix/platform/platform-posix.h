@@ -59,9 +59,7 @@
 /**
  * This is the socket name used by daemon mode.
  */
-#if !OPENTHREAD_POSIX_CONFIG_DAEMON_SOCKET_BASENAME_SET_API_ENABLE
 #define OPENTHREAD_POSIX_DAEMON_SOCKET_NAME OPENTHREAD_POSIX_CONFIG_DAEMON_SOCKET_BASENAME ".sock"
-#endif
 
 #ifdef __cplusplus
 extern "C" {

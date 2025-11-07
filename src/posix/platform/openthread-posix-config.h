@@ -484,15 +484,6 @@
 #define OPENTHREAD_POSIX_CONFIG_MDNS_ADDR_MONITOR_PERIOD (5000)
 #endif
 
-/**
- * @def OPENTHREAD_POSIX_CONFIG_DAEMON_SOCKET_BASENAME_SIZE
- *
- * Define as max of 128 bytes (not including the null '\0' character) to store daemon / socket basename.
- */
-#ifndef OPENTHREAD_POSIX_CONFIG_DAEMON_SOCKET_BASENAME_SIZE
-#define OPENTHREAD_POSIX_CONFIG_DAEMON_SOCKET_BASENAME_SIZE 128
-#endif
-
 //---------------------------------------------------------------------------------------------------------------------
 // Removed or renamed POSIX specific configs.
 

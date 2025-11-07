@@ -40,13 +40,11 @@
  *
  * Define socket basename used by POSIX app daemon.
  */
-#if !OPENTHREAD_POSIX_CONFIG_DAEMON_SOCKET_BASENAME_SET_API_ENABLE
 #ifndef OPENTHREAD_POSIX_CONFIG_DAEMON_SOCKET_BASENAME
 #ifdef __linux__
 #define OPENTHREAD_POSIX_CONFIG_DAEMON_SOCKET_BASENAME "/run/openthread-%s"
 #else
 #define OPENTHREAD_POSIX_CONFIG_DAEMON_SOCKET_BASENAME "/tmp/openthread-%s"
-#endif
 #endif
 #endif
 

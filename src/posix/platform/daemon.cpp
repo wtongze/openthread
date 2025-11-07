@@ -51,8 +51,8 @@
 
 #if OPENTHREAD_POSIX_CONFIG_DAEMON_ENABLE
 
-#if !OPENTHREAD_POSIX_CONFIG_DAEMON_SOCKET_BASENAME_SET_API_ENABLE
 #define OPENTHREAD_POSIX_DAEMON_SOCKET_LOCK OPENTHREAD_POSIX_CONFIG_DAEMON_SOCKET_BASENAME ".lock"
+#if !OPENTHREAD_POSIX_CONFIG_DAEMON_SOCKET_BASENAME_SET_API_ENABLE
 static_assert(sizeof(OPENTHREAD_POSIX_DAEMON_SOCKET_NAME) < sizeof(sockaddr_un::sun_path),
               "OpenThread daemon socket name too long!");
 #endif
@@ -77,6 +77,11 @@ void GetFilename(Filename &aFilename, const char *aPattern)
 }
 
 } // namespace
+
+#if OPENTHREAD_POSIX_CONFIG_DAEMON_SOCKET_BASENAME_SET_API_ENABLE
+char Daemon::mDaemonSocketLock[sizeof(Filename)] = OPENTHREAD_POSIX_DAEMON_SOCKET_LOCK;
+char Daemon::mDaemonSocketName[sizeof(Filename)] = OPENTHREAD_POSIX_DAEMON_SOCKET_NAME;
+#endif
 
 const char Daemon::kLogModuleName[] = "Daemon";
 
@@ -301,8 +306,7 @@ void Daemon::SetDaemonSocketBasename(const char *aDaemonSocketBasename)
         DieNow(OT_EXIT_INVALID_ARGUMENTS);
     }
 
-    if (strnlen(mDaemonSocketLock, OPENTHREAD_POSIX_CONFIG_DAEMON_SOCKET_BASENAME_SIZE) != 
-        strnlen(mDaemonSocketName, OPENTHREAD_POSIX_CONFIG_DAEMON_SOCKET_BASENAME_SIZE))
+    if (strnlen(mDaemonSocketLock, sizeof(Filename)) != strnlen(mDaemonSocketName, sizeof(Filename)))
     {
         DieNow(OT_EXIT_INVALID_ARGUMENTS);
     }

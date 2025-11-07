@@ -46,8 +46,8 @@ public:
     static Daemon &Get(void);
 
 #if OPENTHREAD_POSIX_CONFIG_DAEMON_SOCKET_BASENAME_SET_API_ENABLE
-    static char mDaemonSocketLock[OPENTHREAD_POSIX_CONFIG_DAEMON_SOCKET_BASENAME_SIZE];
-    static char mDaemonSocketName[OPENTHREAD_POSIX_CONFIG_DAEMON_SOCKET_BASENAME_SIZE];
+    static char mDaemonSocketLock[];
+    static char mDaemonSocketName[];
 
     static void SetDaemonSocketBasename(const char *aDaemonSocketBasename);
 #endif
