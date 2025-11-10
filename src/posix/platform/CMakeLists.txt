@@ -105,6 +105,16 @@ if(OT_POSIX_RCP_VENDOR_BUS)
     )
 endif()
 
+option(OT_POSIX_TUN_DEVICE_SET_API_ENABLE "enable set POSIX TUN device at runtime" OFF)
+if(OT_POSIX_TUN_DEVICE_SET_API_ENABLE)
+    target_compile_definitions(ot-posix-config
+        INTERFACE "OPENTHREAD_POSIX_TUN_DEVICE_SET_API_ENABLE=1"
+    )
+
+    list(APPEND OT_PLATFORM_DEFINES "OPENTHREAD_POSIX_TUN_DEVICE_SET_API_ENABLE=1")
+    set(OT_PLATFORM_DEFINES ${OT_PLATFORM_DEFINES} PARENT_SCOPE)
+endif()
+
 set(OT_POSIX_NAT64_CIDR "192.168.255.0/24" CACHE STRING "NAT64 CIDR for OpenThread NAT64")
 if(OT_POSIX_NAT64_CIDR)
     target_compile_definitions(ot-posix-config
