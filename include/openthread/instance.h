@@ -364,8 +364,8 @@ const char *otGetPlatformInfo(otInstance *aInstance);
  *
  * Requires `OPENTHREAD_CONFIG_PLATFORM_INFO_SET_API_ENABLE`.
  *
- * @p aPlatfromInfo should be UTF8 with max length of 32 chars (`OPENTHREAD_CONFIG_PLATFORM_INFO_LENGTH`). Maximum length
- * include the null `\0` character.
+ * @p aPlatfromInfo should have max length of 32 chars (`OPENTHREAD_CONFIG_PLATFORM_INFO_LENGTH`). 
+ * Maximum length include the null `\0` character.
  *
  * @param[in] aInstance          A pointer to an OpenThread instance.
  * @param[in] aPlatfromInfo      The platform info string.
